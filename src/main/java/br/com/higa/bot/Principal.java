@@ -1,11 +1,10 @@
 package br.com.higa.bot;
 
-import static br.com.higa.bot.utils.Constants.BOT_TOKEN;
-
-import java.util.List;
-import java.util.Random;
-
-import br.com.higa.bot.utils.MotivacionalConstants;
+import br.com.caelum.stella.boleto.Boleto;
+import br.com.higa.bot.enums.OpcoesBot;
+import br.com.higa.bot.service.GeradorDeBoletos;
+import br.com.higa.bot.service.ViaCep;
+import br.com.higa.bot.utils.Constants;
 import com.google.gson.JsonObject;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
@@ -17,11 +16,9 @@ import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 
-import br.com.caelum.stella.boleto.Boleto;
-import br.com.higa.bot.enums.OpcoesBot;
-import br.com.higa.bot.service.GeradorDeBoletos;
-import br.com.higa.bot.service.ViaCep;
-import br.com.higa.bot.utils.Constants;
+import java.util.List;
+
+import static br.com.higa.bot.utils.Constants.BOT_TOKEN;
 
 public class Principal {
 	// Criacao do bot!!!
@@ -49,8 +46,6 @@ public class Principal {
 	static String msgRecebidaTxt = "";
 
 	public static void main(String[] args) {
-		ViaCep viaCep = new ViaCep();
-
 		System.out.println("### BOT INICIADO ###");
 
 
@@ -68,14 +63,12 @@ public class Principal {
 				msgRecebidaId = mensagemRecebida.message().chat().id();
 				msgRecebidaTxt = mensagemRecebida.message().text();
 
-				if(Constants.MSG_OLA_1.equalsIgnoreCase(msgRecebidaTxt) || Constants.MSG_OLA_2.equalsIgnoreCase(msgRecebidaTxt) || Constants.MSG_OI_1.equalsIgnoreCase(msgRecebidaTxt) || Constants.BOT_START.equalsIgnoreCase(msgRecebidaTxt)) {
-					executaAcaOlá(mensagemRecebida);
+				if(Constants.BOT_START.equalsIgnoreCase(msgRecebidaTxt)) {
+					executaAcaOla(mensagemRecebida);
 				} else if(msgRecebidaTxt.startsWith(OpcoesBot.CEP.getNome())){
 					executarAcaoCep();
 				} else if (msgRecebidaTxt.startsWith(OpcoesBot.BOLETOS_EM_ABERTO.getNome())){
 					executarAcaoGerarBoleto();
-				} else if (msgRecebidaTxt.startsWith(OpcoesBot.MENSAGEM_MOTIVACIONAL.getNome())) {
-					executarAcaoMensagemMotivacional();
 				} else {
 					executaAcaoOpcaoInvalida();
 				}
@@ -108,9 +101,9 @@ public class Principal {
 		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, getTodasOpcoesBot()));
 	}
 
-	static void executaAcaOlá(Update mensagemRecebida){
+	static void executaAcaOla(Update mensagemRecebida){
 		String nome = mensagemRecebida.message().from().firstName();
-		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, "Olá, " + nome + ", tudo bem?"));
+		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, "Ola, " + nome + ", tudo bem?" + System.getProperty("line.separator")));
 		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, getTodasOpcoesBot()));
 	}
 
@@ -166,11 +159,4 @@ public class Principal {
 		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, getTodasOpcoesBot()));
 	}
 
-	static void executarAcaoMensagemMotivacional(){
-		String[] mensagems = {MotivacionalConstants.MSG_1, MotivacionalConstants.MSG_2, MotivacionalConstants.MSG_3, MotivacionalConstants.MSG_4, MotivacionalConstants.MSG_5};
-		Random property = new Random();
-		int a = property.nextInt(mensagems.length);
-		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, mensagems[a]));
-		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, getTodasOpcoesBot()));
-	}
 }

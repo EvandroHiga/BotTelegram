@@ -1,24 +1,21 @@
 package br.com.higa.bot.service;
 
+import br.com.caelum.stella.boleto.*;
+import br.com.caelum.stella.boleto.bancos.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import br.com.caelum.stella.boleto.Banco;
-import br.com.caelum.stella.boleto.Beneficiario;
-import br.com.caelum.stella.boleto.Boleto;
-import br.com.caelum.stella.boleto.Datas;
-import br.com.caelum.stella.boleto.Endereco;
-import br.com.caelum.stella.boleto.Pagador;
-import br.com.caelum.stella.boleto.bancos.BancoDoBrasil;
-import br.com.caelum.stella.boleto.bancos.Bradesco;
-import br.com.caelum.stella.boleto.bancos.Caixa;
-import br.com.caelum.stella.boleto.bancos.Itau;
-import br.com.caelum.stella.boleto.bancos.Santander;
-
 public class GeradorDeBoletos {
-    private static final String INSTRUCOES = "Instruções ( Todas as informações são de plena responsabilidade do cliente ).";
-    private static final String LOCAIS_DE_PAGAMENTO = "Pagável em Qualquer Banco até o Vencimento";
+    private static final String INSTRUCOES = "Instrucoes (Todas as informacoes sao de plena responsabilidade do cliente).";
+    private static final String LOCAIS_DE_PAGAMENTO = "Pagavel em qualquer banco ate o vencimento.";
     private static final Integer MOEDA = 9;
+    
+    private static final String ITAU = "Itau";
+    private static final String BRADESCO = "Bradesco";
+    private static final String BB = "Banco do Brasil";
+    private static final String SANTANDER = "Santander";
+    private static final String CAIXA = "Caixa Economica Fed";
 
     private String nomeBanco;
 	private LocalDate vencimentoBoleto;
@@ -40,72 +37,96 @@ public class GeradorDeBoletos {
 
         Datas datas = getDatas(vencimentoBoleto, dataDocumentoBoleto);
 
-        Endereco enderecoBeneficiario = Endereco.novoEndereco().comLogradouro("Rua dos devs").comBairro("Jardim Java")
-                .comCep("07112-000").comCidade("São Paulo").comUf("SP");
-
+        Endereco enderecoBeneficiario = Endereco.novoEndereco()
+                .comLogradouro("Rua dos devs")
+                .comBairro("Jardim Java")
+                .comCep("07112-000")
+                .comCidade("Sao Paulo")
+                .comUf("SP");
+        
         Beneficiario beneficiario = getBeneficiario(enderecoBeneficiario);
 
-        Endereco enderecoPagador = Endereco.novoEndereco().comLogradouro("Rua primavera").comBairro("Liberdade")
-                .comCep("07112-001").comCidade("Rio de Janeiro").comUf("RJ");
+        Endereco enderecoPagador = Endereco.novoEndereco()
+                .comLogradouro("Rua primavera")
+                .comBairro("Liberdade")
+                .comCep("07112-001")
+                .comCidade("Rio de Janeiro")
+                .comUf("RJ");
 
-        Pagador pagador = Pagador.novoPagador().comNome("Alex Oliveira").comDocumento("378.689.699-88")
+        Pagador pagador = Pagador.novoPagador()
+                .comNome("Alex Oliveira")
+                .comDocumento("378.689.699-88")
                 .comEndereco(enderecoPagador);
 
         Banco banco = getBanco();
 
-        return Boleto.novoBoleto().comBanco(banco).comDatas(datas).comBeneficiario(beneficiario).comPagador(pagador)
-                .comCodigoEspecieMoeda(MOEDA).comAceite(false).comQuantidadeMoeda(BigDecimal.ZERO)
-                .comValorBoleto(10559).comNumeroDoDocumento("123")
-                .comInstrucoes(INSTRUCOES).comLocaisDePagamento(LOCAIS_DE_PAGAMENTO).comEspecieDocumento("DM");
+        return Boleto.novoBoleto()
+                .comBanco(banco)
+                .comDatas(datas)
+                .comBeneficiario(beneficiario)
+                .comPagador(pagador)
+                .comCodigoEspecieMoeda(MOEDA)
+                .comAceite(false)
+                .comQuantidadeMoeda(BigDecimal.ZERO)
+                .comValorBoleto(10559)
+                .comNumeroDoDocumento("123")
+                .comInstrucoes(INSTRUCOES)
+                .comLocaisDePagamento(LOCAIS_DE_PAGAMENTO)
+                .comEspecieDocumento("DM");
     }
 
     private Datas getDatas(LocalDate vencimentoBoleto, LocalDate dataDocumentoBoleto) {
         Datas datas = Datas.novasDatas()
-                .comDocumento(dataDocumentoBoleto.getDayOfMonth(), dataDocumentoBoleto.getMonthValue(),
-                        dataDocumentoBoleto.getYear())
-
-                .comProcessamento(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue(),
-                        LocalDate.now().getYear())
-
-                .comVencimento(vencimentoBoleto.getDayOfMonth(), vencimentoBoleto.getMonthValue(),
-                        vencimentoBoleto.getYear());
+                .comDocumento(dataDocumentoBoleto.getDayOfMonth(), dataDocumentoBoleto.getMonthValue(), dataDocumentoBoleto.getYear())
+                .comProcessamento(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue(), LocalDate.now().getYear())
+                .comVencimento(vencimentoBoleto.getDayOfMonth(), vencimentoBoleto.getMonthValue(), vencimentoBoleto.getYear());
         return datas;
     }
 
     private Banco getBanco() {
 
-        if (nomeBanco.equals("itau")) {
+        if (nomeBanco.equalsIgnoreCase(ITAU)) {
             return new Itau();
 
-        } else if (nomeBanco.equals("banco do brasil")) {
+        } else if (nomeBanco.equalsIgnoreCase(BB)) {
             return new BancoDoBrasil();
 
-        } else if (nomeBanco.equals("santander")) {
+        } else if (nomeBanco.equalsIgnoreCase(SANTANDER)) {
             return new Santander();
 
-        } else if (nomeBanco.equals("bradesco")) {
+        } else if (nomeBanco.equalsIgnoreCase(BRADESCO)) {
             return new Bradesco();
 
-        } else if (nomeBanco.equals("caixa")) {
+        } else if (nomeBanco.equalsIgnoreCase(CAIXA)) {
             return new Caixa();
         }
 
-        throw new IllegalArgumentException("Banco " + nomeBanco + " não cadastrado.");
+        throw new IllegalArgumentException("Banco " + nomeBanco + " nao cadastrado.");
     }
 
     private Beneficiario getBeneficiario(Endereco enderecoBeneficiario) {
-
-        if (nomeBanco.equals("itau")) {
-            return Beneficiario.novoBeneficiario().comNomeBeneficiario("Devs SA").comAgencia("3217")
-                    .comCodigoBeneficiario("22673").comDigitoCodigoBeneficiario("1")
-                    .comCarteira("112").comEndereco(enderecoBeneficiario).comNossoNumero("123456")
-                    .comDigitoNossoNumero("4").comDocumento("15");
+        if (nomeBanco.equalsIgnoreCase(ITAU)) {
+            return Beneficiario.novoBeneficiario()
+                    .comNomeBeneficiario("Devs SA")
+                    .comAgencia("3217")
+                    .comCodigoBeneficiario("22673")
+                    .comDigitoCodigoBeneficiario("1")
+                    .comCarteira("112")
+                    .comEndereco(enderecoBeneficiario)
+                    .comNossoNumero("123456")
+                    .comDigitoNossoNumero("4")
+                    .comDocumento("15");
         } else {
-            return Beneficiario.novoBeneficiario().comNomeBeneficiario("Devs SA").comAgencia("1635")
-                    .comCodigoBeneficiario("09387495").comDigitoCodigoBeneficiario("4")
-                    .comCarteira("104").comEndereco(enderecoBeneficiario).comNossoNumero("123456")
-                    .comDigitoNossoNumero("4").comDocumento("15");
+            return Beneficiario.novoBeneficiario()
+                    .comNomeBeneficiario("Devs SA")
+                    .comAgencia("1635")
+                    .comCodigoBeneficiario("09387495")
+                    .comDigitoCodigoBeneficiario("4")
+                    .comCarteira("104")
+                    .comEndereco(enderecoBeneficiario)
+                    .comNossoNumero("123456")
+                    .comDigitoNossoNumero("4")
+                    .comDocumento("15");
         }
-
     }
 }

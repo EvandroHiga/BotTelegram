@@ -6,16 +6,10 @@ import br.com.caelum.stella.boleto.bancos.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static br.com.higa.bot.utils.Constants.*;
+
 public class GeradorDeBoletos {
-    private static final String INSTRUCOES = "Instrucoes (Todas as informacoes sao de plena responsabilidade do cliente).";
-    private static final String LOCAIS_DE_PAGAMENTO = "Pagavel em qualquer banco ate o vencimento.";
     private static final Integer MOEDA = 9;
-    
-    private static final String ITAU = "Itau";
-    private static final String BRADESCO = "Bradesco";
-    private static final String BB = "Banco do Brasil";
-    private static final String SANTANDER = "Santander";
-    private static final String CAIXA = "Caixa Economica Fed";
 
     private String nomeBanco;
 	private LocalDate vencimentoBoleto;
@@ -70,8 +64,8 @@ public class GeradorDeBoletos {
                 .comQuantidadeMoeda(BigDecimal.ZERO)
                 .comValorBoleto(10559)
                 .comNumeroDoDocumento("123")
-                .comInstrucoes(INSTRUCOES)
-                .comLocaisDePagamento(LOCAIS_DE_PAGAMENTO)
+                .comInstrucoes(BOLETO_INSTRUCOES)
+                .comLocaisDePagamento(BOLETO_LOCAIS_PAG)
                 .comEspecieDocumento("DM");
     }
 
@@ -84,7 +78,6 @@ public class GeradorDeBoletos {
     }
 
     private Banco getBanco() {
-
         if (nomeBanco.equalsIgnoreCase(ITAU)) {
             return new Itau();
 

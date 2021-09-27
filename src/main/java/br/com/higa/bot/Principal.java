@@ -18,7 +18,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 
 import java.util.List;
 
-import static br.com.higa.bot.utils.Constants.BOT_TOKEN;
+import static br.com.higa.bot.utils.Constants.*;
 
 public class Principal {
 	// Criacao do bot!!!
@@ -103,7 +103,7 @@ public class Principal {
 
 	static void executaAcaOla(Update mensagemRecebida){
 		String nome = mensagemRecebida.message().from().firstName();
-		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, "Ola, " + nome + ", tudo bem?" + System.getProperty("line.separator")));
+		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, "Ola, " + nome + ", tudo bem?"));
 		sendResponse = bot.execute(criaMsgDeResposta(msgRecebidaId, getTodasOpcoesBot()));
 	}
 
@@ -134,8 +134,8 @@ public class Principal {
 	}
 
 	static void executarAcaoGerarBoleto(){
-		GeradorDeBoletos boletoSantander = new GeradorDeBoletos("santander");
-		GeradorDeBoletos boletoItau = new GeradorDeBoletos("itau");
+		GeradorDeBoletos boletoSantander = new GeradorDeBoletos(SANTANDER);
+		GeradorDeBoletos boletoItau = new GeradorDeBoletos(ITAU);
 
 		Boleto boleto1 = boletoSantander.getBoleto();
 		Boleto boleto2 = boletoItau.getBoleto();
@@ -143,14 +143,15 @@ public class Principal {
 		StringBuilder boletos = new StringBuilder();
 
 		boletos.append("02 boletos encontrados:\n\n");
-		boletos.append("Banco Santander");
+
+		boletos.append(SANTANDER);
 		boletos.append("\nData de vencimento "+ boletoSantander.getVencimentoBoleto());
 		boletos.append("\nValor R$ "+ boleto1.getValorBoleto());
 		boletos.append("\nLinha Digitavel:\n"+ boleto1.getLinhaDigitavel());
 
 		boletos.append("\n\n-----\n\n");
 
-		boletos.append("Banco Itau");
+		boletos.append(ITAU);
 		boletos.append("\nData de vencimento "+ boletoItau.getVencimentoBoleto());
 		boletos.append("\nValor R$ "+ boleto2.getValorFormatado());
 		boletos.append("\nLinha Digitavel:\n"+ boleto2.getLinhaDigitavel());

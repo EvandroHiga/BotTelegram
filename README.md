@@ -1,8 +1,8 @@
 ## Telegram Bot
 
-<div style="font-size:11px; color:yellow;">em andamento...</div>
+![#ffff00](https://via.placeholder.com/15/ffff00/000000?text=+) Em andamento...
 
-Bot Telegram multitarefa. Retorna as informações de um CEP dado, gera boletos para pagamentos e informa sobre a previsão do tempo.
+> Bot Telegram multitarefa. Retorna as informações de um CEP dado, gera boletos para pagamentos e informa sobre a previsão do tempo.
 
 **Pré-requisitos**
 > Java 8+, Maven 3 e o [token do bot](https://core.telegram.org/bots).

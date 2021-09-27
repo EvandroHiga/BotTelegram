@@ -1,27 +1,13 @@
-# BotTelegram
+## Telegram Bot
 
-<h2 align=center> Atendimento por Chat</h2>
+<div style="font-size:11px; color:yellow;">em andamento...</div>
 
-*Sobre o projeto:*
-<b>
-<p> Este programa tem por objetivo apresentar ao usuário três fucnionalidades:</p>
+Bot Telegram multitarefa. Retorna as informações de um CEP dado, gera boletos para pagamentos e informa sobre a previsão do tempo.
 
-- Buscar o endereço de um determinado cep
-- Mostar quantidade de Boletos em aberto de um determinado banco.
-- Mandar uma mensagem motivacional aleatória
+**Pré-requisitos**
+> Java 8+, Maven 3 e o [token do bot](https://core.telegram.org/bots).
 
-<h1>
- Como Utilizar
- </h1>
- 
-- Busca Cep:
- 
-      Basta digitar: /cep 07112-001  ou /cep 07112001
-
-- Consulta de Boletos:
- 
-      Basta digitar: /boletos_em_aberto
-     
-- Mensagem motivacinal 
-    
-      Bastar digitar: /mensagem_motivacional
+**Como rodar**
+> 1. Clone o repo com: _git clone https://github.com/EvandroHiga/BotTelegram.git_
+> 2. Abra o _Constants.java_ e insira o token na const. *BOT_TOKEN*.
+> 3. Inicie o proj. e chame o bot pelo Telegram.

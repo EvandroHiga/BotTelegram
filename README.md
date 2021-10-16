@@ -9,6 +9,6 @@
 > Java 8+, Maven 3 e o [token do bot](https://core.telegram.org/bots).
 
 **Como rodar**
-> 1. Clone o repo com: _git clone https://github.com/EvandroHiga/BotTelegram.git_
+> 1. Clone o repo com: `git clone https://github.com/EvandroHiga/BotTelegram.git`
 > 2. Abra o _Constants.java_ e insira o token na const. *BOT_TOKEN*.
 > 3. Inicie o proj. e chame o bot pelo Telegram.

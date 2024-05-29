@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.BaseResponse;
+import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class Principal {
 
 	// Subida do bot
 	static TelegramBot bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
+	// Recebimento de mensagens
+	static GetUpdatesResponse getUpdatesResponse;
 	// Gerenciamento de acoes do chat
 	static BaseResponse baseResponse;
 	// Envio de mensagens
@@ -34,11 +37,10 @@ public class Principal {
 
 	public static void main(String[] args) {
 		log.info("### BOT INICIADO :-) ###");
-		sendResponse = bot.execute(new SendMessage(msgRecebidaId, getDescricaoTodosServicos()));
 
 		while (true){
-			List<Update> mensagensRecebidas =
-					bot.execute(new GetUpdates().limit(OFF_SET_LIMIT).offset(offSet)).updates();
+			getUpdatesResponse =  bot.execute(new GetUpdates().limit(OFF_SET_LIMIT).offset(offSet));
+			List<Update> mensagensRecebidas = getUpdatesResponse.updates();
 
 			for (Update mensagemRecebida : mensagensRecebidas) {
 				offSet = mensagemRecebida.updateId() + 1;
@@ -55,7 +57,7 @@ public class Principal {
 
 				 else  {
 					baseResponse = bot.execute(new SendChatAction(msgRecebidaId, ChatAction.typing.name()));
-					sendResponse = bot.execute(new SendMessage(msgRecebidaId, Constants.MSG_ERRO_OPCAO_INVALIDA));
+					sendResponse = bot.execute(new SendMessage(msgRecebidaId, "Opcao invalida."));
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, getDescricaoTodosServicos()));
 				}
 			}

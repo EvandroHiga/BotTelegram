@@ -2,7 +2,7 @@ package br.com.higa.bot;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import okhttp3.ResponseBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -15,8 +15,6 @@ public class ViaCep {
 	private static final String ERRO = "erro";
 	private static final String AS_JSON = "/json/";
 
-	// TODO
-	//
 	public static String consultarCep(String msgRecebidaTxt){
 		String cep =
 				new StringBuilder(msgRecebidaTxt)
@@ -24,7 +22,7 @@ public class ViaCep {
 						.toString().trim();
 
 		if(cep.matches("[0-9]{5}-[0-9]{3}") || cep.matches("[0-9]{8}")){
-            JsonObject jsonObject = null;
+            JsonObject jsonObject;
             try {
                 jsonObject = getEnderecoByCep(cep);
             } catch (IOException | IllegalStateException exception) {
@@ -38,36 +36,28 @@ public class ViaCep {
 		}
 	}
 
-	// TODO
-//	public static String consultarLogradouro(String msgRecebidaTxt){
-//		return "";
-//	}
-
 	private static JsonObject getEnderecoByCep(String cep) throws IOException, IllegalStateException {
 		final String url = URL_VIA_CEP + cep + AS_JSON;
-
-		try(ResponseBody responseBody = new OkHttpConnection().makeGetRequest(url)){
-			return JsonParser.parseString(responseBody.string()).getAsJsonObject();
+		try(Response response = new OkHttpConnection().makeGetRequest(url)){
+			return JsonParser.parseString(response.body().string()).getAsJsonObject();
 		}
 	}
 
 	private static String parseViaCepJson(JsonObject jsonObject){
-		StringBuilder stringBuilder = new StringBuilder();
-
-		stringBuilder
-				.append("Logradouro: ").append(jsonObject.get("logradouro").getAsString())
-				.append(System.lineSeparator())
-				.append("Complemento: ").append(jsonObject.get("complemento").getAsString())
-				.append(System.lineSeparator())
-				.append("Bairro: ").append(jsonObject.get("bairro").getAsString())
-				.append(System.lineSeparator())
-				.append(jsonObject.get("localidade").getAsString()).append(" - ").append(jsonObject.get("uf").getAsString())
-				.append(System.lineSeparator())
-				.append(jsonObject.get("cep").getAsString())
-				.append(System.lineSeparator())
-				.append("DDD: ").append(jsonObject.get("ddd").getAsString());
-
-		return stringBuilder.toString();
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder
+			.append("Logradouro: ").append(jsonObject.get("logradouro").getAsString())
+			.append(System.lineSeparator())
+			.append("Complemento: ").append(jsonObject.get("complemento").getAsString())
+			.append(System.lineSeparator())
+			.append("Bairro: ").append(jsonObject.get("bairro").getAsString())
+			.append(System.lineSeparator())
+			.append(jsonObject.get("localidade").getAsString()).append(" - ").append(jsonObject.get("uf").getAsString())
+			.append(System.lineSeparator())
+			.append(jsonObject.get("cep").getAsString())
+			.append(System.lineSeparator())
+			.append("DDD: ").append(jsonObject.get("ddd").getAsString());
+		return strBuilder.toString();
 	}
 
 }

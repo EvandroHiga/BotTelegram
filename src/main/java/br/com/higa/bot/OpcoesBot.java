@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum OpcoesBot {
-    CEP("/cep", "'/cep <cep_desejado>': Retorna informacoes sobre o CEP consultado. Ex.: /cep 00000-000 ou /cep 00000000");
+    CEP("/cep", "'/cep <cep_desejado>': Retorna informacoes sobre o CEP consultado." + System.lineSeparator() + "Ex.: /cep 00000-000 ou /cep 00000000");
 
     private final String nomeServico;
     private final String descricaoServico;

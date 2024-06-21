@@ -81,8 +81,10 @@ public class ViaCep {
 		StringBuilder strBuilder = new StringBuilder();
 		int qtdeEnderecos = Math.min(jsonArray.size(), MAX_QTY_ADDRESSES_BY_LOGRADOURO);
         for(int i=0; i < qtdeEnderecos; i++){
-			JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-			strBuilder.append(parseViaCepJsonObj(jsonObject.getAsJsonObject())).append(System.lineSeparator()).append(System.lineSeparator());
+			strBuilder
+					.append(parseViaCepJsonObj(jsonArray.get(i).getAsJsonObject()))
+					.append(System.lineSeparator())
+					.append(System.lineSeparator());
 		}
 		return strBuilder.toString().trim();
 	}

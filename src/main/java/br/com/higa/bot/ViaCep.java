@@ -6,14 +6,16 @@ import com.google.gson.JsonParser;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.logging.Logger;
 
+import static br.com.higa.bot.Constants.MAX_QTY_ADDRESSES_BY_LOGRADOURO;
 import static br.com.higa.bot.Constants.URL_VIA_CEP;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ViaCep {
 	static Logger log = Logger.getLogger(ViaCep.class.getName());
 
-	private static final String ERRO = "erro";
 	private static final String AS_JSON = "/json/";
 
 	public static String consultarCep(String msgRecebidaTxt){
@@ -30,7 +32,7 @@ public class ViaCep {
 				log.info(msgErro);
 				return msgErro;
             }
-			return parseViaCepJson(jsonObject);
+			return parseViaCepJsonObj(jsonObject);
 		} else {
 			return "CEP invalido.";
 		}
@@ -38,26 +40,26 @@ public class ViaCep {
 
 	public static String consultarLogradouro(String msgRecebidaTxt) {
 		try{
-		String logradouroCompleto =
-				new StringBuilder(msgRecebidaTxt)
-						.delete(0, OpcoesBot.RUA.getNomeServico().length()).toString().toLowerCase().trim();
+			String logradouroCompleto =
+					new StringBuilder(msgRecebidaTxt)
+							.delete(0, OpcoesBot.RUA.getNomeServico().length()).toString().toLowerCase().trim();
 
-		String uf = logradouroCompleto.substring(0, logradouroCompleto.indexOf(",")).trim();
-		String cidade = logradouroCompleto.substring(logradouroCompleto.indexOf(",")+1, logradouroCompleto.lastIndexOf(",")).trim();
-		String logradouro = logradouroCompleto.substring(logradouroCompleto.lastIndexOf(",")+1, logradouroCompleto.length()).trim();
-
+			String uf = logradouroCompleto.substring(0, logradouroCompleto.indexOf(",")).trim();
+			String cidade = logradouroCompleto.substring(logradouroCompleto.indexOf(",") + 1, logradouroCompleto.lastIndexOf(",")).trim();
+			String logradouro = logradouroCompleto.substring(logradouroCompleto.lastIndexOf(",") + 1).trim();
 
 			JsonArray jsonArray = getEnderecoByLogradouro(uf, cidade, logradouro);
-			return parseViaCepLogradouroJson(jsonArray);
+
+			return parseViaCepJsonArray(jsonArray);
 		} catch(StringIndexOutOfBoundsException e){
-			return "ERRO - " + e.getMessage();
-		}
-		catch (IOException | IllegalStateException exception) {
+			String msgErro = "Erro - Formate a mensagem conforme descricao do servico." + System.lineSeparator() + System.lineSeparator() + OpcoesBot.RUA.getDescricaoServico();
+			log.info(msgErro);
+			return msgErro;
+		} catch (IOException | IllegalStateException exception) {
 			String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
 			log.info(msgErro);
 			return msgErro;
 		}
-
 	}
 
 	private static JsonObject getEnderecoByCep(String cep) throws IOException, IllegalStateException {
@@ -68,14 +70,24 @@ public class ViaCep {
 	}
 
 	private static JsonArray getEnderecoByLogradouro(String uf, String cidade, String logradouro) throws IOException, IllegalStateException {
-		final String url = URL_VIA_CEP + uf + "/" + cidade + "/" + logradouro + AS_JSON;
-
-		try(Response response = new OkHttpConnection().makeGetRequest(url)){
+		final String url =
+				URL_VIA_CEP + URLEncoder.encode(uf, UTF_8) + "/" + URLEncoder.encode(cidade, UTF_8) + "/" + URLEncoder.encode(logradouro, UTF_8) + AS_JSON;
+		try(Response response = new OkHttpConnection().makeGetRequest(url.replace("+", "%20"))){
 			return JsonParser.parseString(response.body().string()).getAsJsonArray();
 		}
 	}
 
-	private static String parseViaCepJson(JsonObject jsonObject){
+	private static String parseViaCepJsonArray(JsonArray jsonArray) {
+		StringBuilder strBuilder = new StringBuilder();
+		int qtdeEnderecos = Math.min(jsonArray.size(), MAX_QTY_ADDRESSES_BY_LOGRADOURO);
+        for(int i=0; i < qtdeEnderecos; i++){
+			JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+			strBuilder.append(parseViaCepJsonObj(jsonObject.getAsJsonObject())).append(System.lineSeparator()).append(System.lineSeparator());
+		}
+		return strBuilder.toString().trim();
+	}
+
+	private static String parseViaCepJsonObj(JsonObject jsonObject){
 		StringBuilder strBuilder = new StringBuilder();
 		strBuilder
 			.append("Logradouro: ").append(jsonObject.get("logradouro").getAsString())
@@ -90,10 +102,6 @@ public class ViaCep {
 			.append(System.lineSeparator())
 			.append("DDD: ").append(jsonObject.get("ddd").getAsString());
 		return strBuilder.toString();
-	}
-
-	private static String parseViaCepLogradouroJson(JsonArray jsonArray) {
-		return parseViaCepJson(jsonArray.get(0).getAsJsonObject());
 	}
 
 }

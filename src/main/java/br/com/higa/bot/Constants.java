@@ -6,4 +6,5 @@ import lombok.experimental.UtilityClass;
 public class Constants {
     public static final String TELEGRAM_BOT_TOKEN = "6770099999:AAEjqUnMk-RaNNrQTEGMOz-kUeenGWwRJqc";
     public static final String URL_VIA_CEP = "https://viacep.com.br/ws/";
+    public static final int MAX_QTY_ADDRESSES_BY_LOGRADOURO = 10;
 }

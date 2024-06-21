@@ -1,5 +1,6 @@
 package br.com.higa.bot;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okhttp3.Response;
@@ -18,8 +19,7 @@ public class ViaCep {
 	public static String consultarCep(String msgRecebidaTxt){
 		String cep =
 				new StringBuilder(msgRecebidaTxt)
-						.delete(0, OpcoesBot.CEP.getNomeServico().length())
-						.toString().trim();
+						.delete(0, OpcoesBot.CEP.getNomeServico().length()).toString().trim();
 
 		if(cep.matches("[0-9]{5}-[0-9]{3}") || cep.matches("[0-9]{8}")){
             JsonObject jsonObject;
@@ -36,10 +36,42 @@ public class ViaCep {
 		}
 	}
 
+	public static String consultarLogradouro(String msgRecebidaTxt) {
+		try{
+		String logradouroCompleto =
+				new StringBuilder(msgRecebidaTxt)
+						.delete(0, OpcoesBot.RUA.getNomeServico().length()).toString().toLowerCase().trim();
+
+		String uf = logradouroCompleto.substring(0, logradouroCompleto.indexOf(",")).trim();
+		String cidade = logradouroCompleto.substring(logradouroCompleto.indexOf(",")+1, logradouroCompleto.lastIndexOf(",")).trim();
+		String logradouro = logradouroCompleto.substring(logradouroCompleto.lastIndexOf(",")+1, logradouroCompleto.length()).trim();
+
+
+			JsonArray jsonArray = getEnderecoByLogradouro(uf, cidade, logradouro);
+			return parseViaCepLogradouroJson(jsonArray);
+		} catch(StringIndexOutOfBoundsException e){
+			return "ERRO - " + e.getMessage();
+		}
+		catch (IOException | IllegalStateException exception) {
+			String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
+			log.info(msgErro);
+			return msgErro;
+		}
+
+	}
+
 	private static JsonObject getEnderecoByCep(String cep) throws IOException, IllegalStateException {
 		final String url = URL_VIA_CEP + cep + AS_JSON;
 		try(Response response = new OkHttpConnection().makeGetRequest(url)){
 			return JsonParser.parseString(response.body().string()).getAsJsonObject();
+		}
+	}
+
+	private static JsonArray getEnderecoByLogradouro(String uf, String cidade, String logradouro) throws IOException, IllegalStateException {
+		final String url = URL_VIA_CEP + uf + "/" + cidade + "/" + logradouro + AS_JSON;
+
+		try(Response response = new OkHttpConnection().makeGetRequest(url)){
+			return JsonParser.parseString(response.body().string()).getAsJsonArray();
 		}
 	}
 
@@ -58,6 +90,10 @@ public class ViaCep {
 			.append(System.lineSeparator())
 			.append("DDD: ").append(jsonObject.get("ddd").getAsString());
 		return strBuilder.toString();
+	}
+
+	private static String parseViaCepLogradouroJson(JsonArray jsonArray) {
+		return parseViaCepJson(jsonArray.get(0).getAsJsonObject());
 	}
 
 }

@@ -51,11 +51,11 @@ public class Principal {
 					baseResponse = bot.execute(new SendChatAction(msgRecebidaId, ChatAction.typing.name()));
 					final String responseViaCep = ViaCep.consultarCep(msgRecebidaTxt);
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, responseViaCep));
-				}
-
-
-
-				 else  {
+				} else if(msgRecebidaTxt.startsWith(OpcoesBot.RUA.getNomeServico().toLowerCase())){
+					baseResponse = bot.execute(new SendChatAction(msgRecebidaId, ChatAction.typing.name()));
+					final String responseViaCep = ViaCep.consultarLogradouro(msgRecebidaTxt);
+					sendResponse = bot.execute(new SendMessage(msgRecebidaId, responseViaCep));
+				} else  {
 					baseResponse = bot.execute(new SendChatAction(msgRecebidaId, ChatAction.typing.name()));
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, "Opcao invalida."));
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, getDescricaoTodosServicos()));

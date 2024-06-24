@@ -32,7 +32,7 @@ public class ViaCep {
 				log.info(msgErro);
 				return msgErro;
             } catch (Exception exception){
-				String msgErro = "Erro inesperado no servico. Tente novamente mais tarde.";
+				String msgErro = "Erro inesperado. Tente novamente mais tarde.";
 				log.info(msgErro);
 				return msgErro;
 			}
@@ -64,7 +64,7 @@ public class ViaCep {
 			log.info(msgErro);
 			return msgErro;
 		} catch (Exception exception) {
-			String msgErro = "Erro inesperado no servico. Tente novamente mais tarde";
+			String msgErro = "Erro inesperado. Tente novamente mais tarde";
 			log.info(msgErro);
 			return msgErro;
 		}
@@ -73,7 +73,11 @@ public class ViaCep {
 	private static JsonObject getEnderecoByCep(String cep) throws IOException, IllegalStateException {
 		final String url = URL_VIA_CEP + cep + AS_JSON;
 		try(Response response = new OkHttpConnection().makeGetRequest(url)){
-			return JsonParser.parseString(response.body().string()).getAsJsonObject();
+			if(response.code() == 200){
+				return JsonParser.parseString(response.body().string()).getAsJsonObject();
+			} else {
+				throw new IOException();
+			}
 		}
 	}
 
@@ -81,7 +85,16 @@ public class ViaCep {
 		final String url =
 				URL_VIA_CEP + URLEncoder.encode(uf, UTF_8) + "/" + URLEncoder.encode(cidade, UTF_8) + "/" + URLEncoder.encode(logradouro, UTF_8) + AS_JSON;
 		try(Response response = new OkHttpConnection().makeGetRequest(url.replace("+", "%20"))){
-			return JsonParser.parseString(response.body().string()).getAsJsonArray();
+			if(response.code() == 200){
+				return JsonParser.parseString(response.body().string()).getAsJsonArray();
+			} else {
+				if(response.code() >= 400 && response.code() < 500) {
+					throw new StringIndexOutOfBoundsException();
+				} else {
+					throw new IOException();
+				}
+			}
+
 		}
 	}
 

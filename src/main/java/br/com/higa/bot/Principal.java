@@ -36,7 +36,7 @@ public class Principal {
 	static int offSet = 0;
 
 	public static void main(String[] args) {
-		log.info("### BOT INICIADO :-) ###");
+		log.info("CepBot : Iniciado.");
 
 		while (true){
 			getUpdatesResponse =  bot.execute(new GetUpdates().limit(OFF_SET_LIMIT).offset(offSet));
@@ -47,6 +47,8 @@ public class Principal {
 				msgRecebidaId = mensagemRecebida.message().chat().id();
 				msgRecebidaTxt = mensagemRecebida.message().text();
 
+				log.info("CepBot : Mensagem recebida: " + msgRecebidaTxt);
+
 				baseResponse = bot.execute(new SendChatAction(msgRecebidaId, ChatAction.typing.name()));
 
 				if(msgRecebidaTxt.startsWith(OpcoesBot.CEP.getNomeServico().toLowerCase())){
@@ -54,9 +56,11 @@ public class Principal {
 				} else if(msgRecebidaTxt.startsWith(OpcoesBot.RUA.getNomeServico().toLowerCase())){
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, ViaCep.consultarLogradouro(msgRecebidaTxt)));
 				} else  {
+					log.info("CepBot : Opcao selecionada invalida.");
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, "Opcao invalida."));
 					sendResponse = bot.execute(new SendMessage(msgRecebidaId, getDescricaoTodosServicos()));
 				}
+				log.info("CepBot : Processamento da mensagem finalizado.");
 			}
 		}
 	}

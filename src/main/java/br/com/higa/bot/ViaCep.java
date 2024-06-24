@@ -19,6 +19,8 @@ public class ViaCep {
 	private static final String AS_JSON = "/json/";
 
 	public static String consultarCep(String msgRecebidaTxt){
+		log.info("CepBot : Consulta por CEP iniciada.");
+
 		String cep =
 				new StringBuilder(msgRecebidaTxt)
 						.delete(0, OpcoesBot.CEP.getNomeServico().length()).toString().trim();
@@ -29,20 +31,24 @@ public class ViaCep {
                 jsonObject = getEnderecoByCep(cep);
             } catch (IOException | IllegalStateException exception) {
 				String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
-				log.info(msgErro);
+				log.info("CepBot : " + msgErro);
 				return msgErro;
             } catch (Exception exception){
 				String msgErro = "Erro inesperado. Tente novamente mais tarde.";
-				log.info(msgErro);
+				log.info("CepBot : " + msgErro);
 				return msgErro;
 			}
 			return parseViaCepJsonObj(jsonObject);
 		} else {
-			return "CEP invalido.";
+			String msg = "CEP invalido.";
+			log.info("CepBot : " + msg);
+			return msg;
 		}
 	}
 
 	public static String consultarLogradouro(String msgRecebidaTxt) {
+		log.info("CepBot : Consulta por LOGRADOURO iniciada");
+
 		try{
 			String logradouroCompleto =
 					new StringBuilder(msgRecebidaTxt)
@@ -56,25 +62,30 @@ public class ViaCep {
 
 			return parseViaCepJsonArray(jsonArray);
 		} catch(StringIndexOutOfBoundsException e){
-			String msgErro = "Erro - Formate a mensagem conforme descricao do servico." + System.lineSeparator() + System.lineSeparator() + OpcoesBot.RUA.getDescricaoServico();
-			log.info(msgErro);
-			return msgErro;
+			String msgErro = "Erro - Formate a mensagem conforme descricao do servico.";
+			log.info("CepBot : " + msgErro);
+			return msgErro +  System.lineSeparator() + System.lineSeparator() + OpcoesBot.RUA.getDescricaoServico();
 		} catch (IOException | IllegalStateException exception) {
 			String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
-			log.info(msgErro);
+			log.info("CepBot : " + msgErro);
 			return msgErro;
 		} catch (Exception exception) {
-			String msgErro = "Erro inesperado. Tente novamente mais tarde";
-			log.info(msgErro);
+			String msgErro = "Erro inesperado. Tente novamente mais tarde.";
+			log.info("CepBot : " + msgErro);
 			return msgErro;
 		}
 	}
 
 	private static JsonObject getEnderecoByCep(String cep) throws IOException, IllegalStateException {
 		final String url = URL_VIA_CEP + cep + AS_JSON;
+
+		log.info("CepBot : URL a ser consultada" + url);
+
 		try(Response response = new OkHttpConnection().makeGetRequest(url)){
 			if(response.code() == 200){
-				return JsonParser.parseString(response.body().string()).getAsJsonObject();
+				final String responseBodyStr = response.body().string();
+				log.info("CepBot : Sucesso. Response Body: " + responseBodyStr);
+				return JsonParser.parseString(responseBodyStr).getAsJsonObject();
 			} else {
 				throw new IOException();
 			}
@@ -84,9 +95,15 @@ public class ViaCep {
 	private static JsonArray getEnderecoByLogradouro(String uf, String cidade, String logradouro) throws IOException, IllegalStateException {
 		final String url =
 				URL_VIA_CEP + URLEncoder.encode(uf, UTF_8) + "/" + URLEncoder.encode(cidade, UTF_8) + "/" + URLEncoder.encode(logradouro, UTF_8) + AS_JSON;
-		try(Response response = new OkHttpConnection().makeGetRequest(url.replace("+", "%20"))){
+		final String finalUrl = url.replace("+", "%20");
+
+		log.info("CepBot : URL a ser consultada" + finalUrl);
+
+		try(Response response = new OkHttpConnection().makeGetRequest(finalUrl)){
 			if(response.code() == 200){
-				return JsonParser.parseString(response.body().string()).getAsJsonArray();
+				String responseBodyStr = response.body().string();
+				log.info("CepBot : Sucesso. Response Body: " + responseBodyStr);
+				return JsonParser.parseString(responseBodyStr).getAsJsonArray();
 			} else {
 				if(response.code() >= 400 && response.code() < 500) {
 					throw new StringIndexOutOfBoundsException();

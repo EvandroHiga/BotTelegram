@@ -31,7 +31,11 @@ public class ViaCep {
 				String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
 				log.info(msgErro);
 				return msgErro;
-            }
+            } catch (Exception exception){
+				String msgErro = "Erro inesperado no servico. Tente novamente mais tarde.";
+				log.info(msgErro);
+				return msgErro;
+			}
 			return parseViaCepJsonObj(jsonObject);
 		} else {
 			return "CEP invalido.";
@@ -57,6 +61,10 @@ public class ViaCep {
 			return msgErro;
 		} catch (IOException | IllegalStateException exception) {
 			String msgErro = "Erro no servico ViaCep. Tente novamente mais tarde.";
+			log.info(msgErro);
+			return msgErro;
+		} catch (Exception exception) {
+			String msgErro = "Erro inesperado no servico. Tente novamente mais tarde";
 			log.info(msgErro);
 			return msgErro;
 		}
